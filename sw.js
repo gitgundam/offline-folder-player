@@ -74,4 +74,4 @@ self.addEventListener('fetch',event=>{
  if(/^(b\/|data\/|__support\/)/.test(path))event.respondWith(new Response('资源请求缺少目录会话；请从启动器进入。',{status:503}));
 });
 
-// launcher-build: 99442fd85911ad2f
+// launcher-build: 16110f5b04127d4a

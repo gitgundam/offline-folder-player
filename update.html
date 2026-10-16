@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>更新离线启动器</title><style>body{max-width:640px;margin:60px auto;padding:24px;font:17px/1.8 -apple-system,"PingFang SC",sans-serif;background:#101a15;color:#eaf1e8}a{color:#c4e4a6}</style><h1>更新离线启动器</h1><p id="status">正在联网检查网页更新；资源目录不会被改动。</p><p><a href="./">返回启动页</a></p><script>
+(async()=>{
+ const status=document.getElementById('status');
+ try{
+  if(!navigator.onLine)throw new Error('请先联网，再打开这个更新入口。');
+  const registration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
+  await registration.update();
+  const worker=registration.installing||registration.waiting;
+  if(worker&&worker.state!=='activated')await new Promise((resolve,reject)=>{
+   const timer=setTimeout(()=>reject(new Error('网页更新超时，请稍后重新打开这个入口。')),45000);
+   const changed=()=>{if(worker.state==='activated'){clearTimeout(timer);resolve()}else if(worker.state==='redundant'){clearTimeout(timer);reject(new Error('网页更新校验未完成，请稍后重试。'))}};
+   worker.addEventListener('statechange',changed);changed();
+  });
+  const active=registration.active;if(!active)throw new Error('启动器尚未激活，请稍后重试。');
+  const info=await new Promise((resolve,reject)=>{const channel=new MessageChannel(),timer=setTimeout(()=>reject(new Error('检查更新版本超时。')),10000);channel.port1.onmessage=e=>{clearTimeout(timer);channel.port1.close();resolve(e.data)};active.postMessage({type:'status'},[channel.port2])});
+  if(!info.ready)throw new Error('网页缓存不完整，请稍后重试。');
+  status.textContent='已更新到 '+info.build+'，正在返回…';location.replace('./?updated='+info.build.slice(0,8));
+ }catch(error){status.textContent=error.message}
+})();
+</script></html>

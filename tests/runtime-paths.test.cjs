@@ -25,6 +25,13 @@ test('channels stay scoped to the same session in both pages and native Workers'
 });
 test('plain resource bytes and unrelated script text are unchanged',()=>{
  assert.equal(adapt('/data/test.bin','opaque','/offline-folder-player/',id),'opaque');
- assert.equal(adapt('/b/build/loader.js','const x=1','/',id),'const x=1');
+ assert.equal(adapt('/b/build/audio-worklet.js','const x=1','/',id),'const x=1');
  assert.throws(()=>adapt('/','x','/../../',id),/scope/);
+});
+test('worker diagnostics preserve strict mode and unchanged memory arguments',()=>{
+ const script="// A worker\n'use strict';\nvar INITIAL_MEMORY=3221225472;new WebAssembly.Memory({initial:INITIAL_MEMORY/65536,maximum:65535,shared:true});";
+ const out=adapt('/b/build/game.js',script,'/offline-folder-player/',id);
+ assert.ok(out.startsWith("// A worker\n'use strict';"));
+ let observed;vm.runInNewContext(out,{__folderRuntimeMemory:options=>{observed=options}});
+ assert.equal(observed.initial,49152);assert.equal(observed.maximum,65535);assert.equal(observed.shared,true);
 });

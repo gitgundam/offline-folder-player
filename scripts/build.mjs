@@ -1,7 +1,7 @@
 import {readFile,writeFile,stat} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 const root=new URL('../',import.meta.url);
-const names=['index.html','style.css','app.js','reader.js','runtime-paths.js','manifest.webmanifest','icon.svg','controls/input.js','controls/touch.js','controls/touch.css','controls/nipplejs.js','controls/NIPPLEJS-LICENSE.txt'];
+const names=['index.html','style.css','app.js','reader.js','runtime-paths.js','startup-log.js','runtime-diagnostics.js','manifest.webmanifest','icon.svg','controls/input.js','controls/touch.js','controls/touch.css','controls/nipplejs.js','controls/NIPPLEJS-LICENSE.txt'];
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const files={};let bytes=0;
 for(const name of names){const data=await readFile(new URL(name,root));files[name==='index.html'?'':name]=hash(data);bytes+=data.length}
