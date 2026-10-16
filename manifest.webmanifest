@@ -1,0 +1,1 @@
+{"name":"离线资源启动器","short_name":"离线启动","id":"./","start_url":"./","scope":"./","display":"standalone","orientation":"landscape","background_color":"#101a15","theme_color":"#14231b","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
